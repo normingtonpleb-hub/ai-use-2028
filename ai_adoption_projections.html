@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Adoption Projections — June 2028</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --grey: #c8c4b8;
+    --grey-light: #d8d5cb;
+    --green: #3daa6d;
+    --green-light: #5dbe87;
+    --gold: #c9a832;
+    --red: #c04040;
+    --bg: #f5f2ea;
+    --text: #2a2825;
+    --text-muted: #7a766d;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding: 40px 20px 80px;
+  }
+
+  .header {
+    max-width: 1400px;
+    margin: 0 auto 50px;
+    text-align: center;
+  }
+
+  .header h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 2.8rem;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+    line-height: 1.15;
+  }
+
+  .header .subtitle {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .header .source {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-top: 8px;
+    opacity: 0.7;
+  }
+
+  .tab-container {
+    max-width: 1400px;
+    margin: 0 auto 30px;
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+  }
+
+  .tab {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    padding: 10px 24px;
+    border: 1.5px solid #d0cdc4;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    letter-spacing: 0.02em;
+  }
+
+  .tab:first-child { border-radius: 8px 0 0 8px; }
+  .tab:last-child { border-radius: 0 8px 8px 0; }
+
+  .tab.active {
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+  }
+
+  .tab:hover:not(.active) {
+    background: #e8e5dc;
+  }
+
+  .chart-section {
+    display: none;
+    max-width: 1000px;
+    margin: 0 auto;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .chart-section.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .chart-header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .chart-header h2 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 1.9rem;
+    font-weight: 400;
+    margin-bottom: 6px;
+  }
+
+  .chart-header .meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .dot-grid {
+    display: grid;
+    grid-template-columns: repeat(50, 1fr);
+    gap: 2px;
+    max-width: 900px;
+    margin: 0 auto 28px;
+    padding: 12px;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+
+  .dot {
+    aspect-ratio: 1;
+    border-radius: 2px;
+    transition: transform 0.15s ease;
+  }
+
+  .dot:hover {
+    transform: scale(1.8);
+    z-index: 10;
+    position: relative;
+  }
+
+  .dot.never { background: var(--grey); }
+  .dot.free { background: var(--green); }
+  .dot.paid { background: var(--gold); }
+  .dot.code { background: var(--red); }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px 36px;
+    margin-bottom: 12px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .legend-swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 2px;
+  }
+
+  .legend-label {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+
+  .legend-label strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .legend-label .pct {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    opacity: 0.7;
+  }
+
+  .narrative {
+    max-width: 720px;
+    margin: 30px auto 0;
+    padding: 24px 28px;
+    background: white;
+    border-left: 3px solid var(--text);
+    border-radius: 0 6px 6px 0;
+    font-size: 0.85rem;
+    line-height: 1.75;
+    color: var(--text-muted);
+  }
+
+  .narrative strong {
+    color: var(--text);
+  }
+
+  .narrative .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text);
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .comparison-strip {
+    max-width: 900px;
+    margin: 40px auto 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2px;
+    background: #d0cdc4;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .comparison-cell {
+    background: white;
+    padding: 18px 16px;
+    text-align: center;
+  }
+
+  .comparison-cell .cell-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  .comparison-cell .cell-value {
+    font-family: 'Instrument Serif', serif;
+    font-size: 1.6rem;
+  }
+
+  .comparison-cell .cell-sub {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .delta-positive { color: var(--green); }
+  .delta-negative { color: var(--red); }
+
+  @media (max-width: 700px) {
+    .header h1 { font-size: 1.8rem; }
+    .dot-grid { grid-template-columns: repeat(50, 1fr); gap: 1px; padding: 6px; }
+    .comparison-strip { grid-template-columns: 1fr; }
+    .tab { font-size: 0.72rem; padding: 8px 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Each dot is ~3.2 million people</h1>
+  <p class="subtitle">
+    2,500 dots = ~8.1 billion humans. Color = most advanced AI interaction.<br>
+    Three views: today's baseline, the Citrini doomer scenario, and Opus 4.6's projection.
+  </p>
+  <p class="source">Data exercise based on Citrini Research "The 2028 Global Intelligence Crisis" (Feb 2026)</p>
+</div>
+
+<div class="tab-container">
+  <button class="tab active" onclick="showTab('baseline')">Feb 2026 — Baseline</button>
+  <button class="tab" onclick="showTab('doomer')">June 2028 — Citrini Doomer</button>
+  <button class="tab" onclick="showTab('opus')">June 2028 — Opus 4.6</button>
+</div>
+
+<!-- BASELINE -->
+<div id="baseline" class="chart-section active">
+  <div class="chart-header">
+    <h2>February 2026 — Current State</h2>
+    <div class="meta">The world as it stands. 84% of humanity has never directly used AI.</div>
+  </div>
+  <div class="dot-grid" id="grid-baseline"></div>
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:var(--grey)"></div>
+      <div class="legend-label">Never used AI · <strong>~6.8B</strong> <span class="pct">(84%)</span></div>
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:var(--green)"></div>
+      <div class="legend-label">Free chatbot user · <strong>~1.3B</strong> <span class="pct">(16%)</span></div>
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:var(--gold)"></div>
+      <div class="legend-label">Pays $20/mo for AI · <strong>~15–25M</strong> <span class="pct">(~0.3%)</span></div>
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:var(--red)"></div>
+      <div class="legend-label">Uses coding scaffold · <strong>~2–5M</strong> <span class="pct">(~0.04%)</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- DOOMER -->
+<div id="doomer" class="chart-section">
+  <div class="chart-header">
+    <h2>June 2028 — Citrini Doomer Scenario</h2>
+    <div class="meta">AI agents became invisible infrastructure. S&P down 38%. Unemployment 10.2%.<br>"People were using AI agents who didn't even know what an AI agent was."</div>
+  </div>
+  <div class="dot-grid" id="grid-doomer"></div>
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:var(--grey)"></div>
+      <div class="legend-label">Never used AI · <strong>~2.9B</strong> <span class="pct">(35%)</span></div>
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:var(--green)"></div>
+      <div class="legend-label">Free / embedded AI user · <strong>~4.6B</strong> <span class="pct">(56%)</span></div>
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:var(--gold)"></div>
+      <div class="legend-label">Pays $20/mo for AI · <strong>~650M</strong> <span class="pct">(8%)</span></div>
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:var(--red)"></div>
+      <div class="legend-label">Uses coding scaffold · <strong>~80M</strong> <span class="pct">(1%)</span></div>
+    </div>
+  </div>
+  <div class="narrative">
+    <span class="label">Scenario Rationale</span>
+    <strong>AI becomes invisible plumbing.</strong> Citrini describes a world where LLM usage became default by early 2027 — embedded in phones, running as background agents, handling shopping, insurance, travel. The median American consumed 400K tokens/day by March 2027. The "free user" category explodes because AI is simply what your phone does now. But the <strong>paid tier is suppressed</strong> — mass white-collar unemployment means fewer individuals can justify $20/mo, even as businesses spend heavily on AI to replace headcount. Coding scaffolds grow ~20x but remain niche; the article notes AI "writes essentially all code" but that's corporate AI, not individual subscriptions. The developing world still lags, keeping ~35% of humanity AI-untouched.
+  </div>
+</div>
+
+<!-- OPUS -->
+<div id="opus" class="chart-section">
+  <div class="chart-header">
+    <h2>June 2028 — Opus 4.6 Projection</h2>
+    <div class="meta">A more measured view. Rapid but uneven adoption. Economic disruption is real but not catastrophic.<br>The key difference: a healthier economy means more people <em>choose</em> to pay.</div>
+  </div>
+  <div class="dot-grid" id="grid-opus"></div>
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:var(--grey)"></div>
+      <div class="legend-label">Never used AI · <strong>~4.1B</strong> <span class="pct">(50%)</span></div>
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:var(--green)"></div>
+      <div class="legend-label">Free chatbot user · <strong>~2.9B</strong> <span class="pct">(35%)</span></div>
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:var(--gold)"></div>
+      <div class="legend-label">Pays $20/mo for AI · <strong>~900M</strong> <span class="pct">(11%)</span></div>
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:var(--red)"></div>
+      <div class="legend-label">Uses coding scaffold · <strong>~330M</strong> <span class="pct">(4%)</span></div>
+    </div>
+  </div>
+  <div class="narrative">
+    <span class="label">Projection Rationale</span>
+    <strong>Faster paid adoption, slower passive saturation.</strong> My projection diverges from Citrini's in structure, not total AI contact. I expect AI capabilities to advance rapidly, but the economic feedback loops to be slower and less catastrophic than the doomer scenario models — policy response, corporate inertia, and regulatory friction all act as brakes. The critical difference: in a healthier economy, <strong>more people can afford and choose to pay</strong> for premium AI tools. Coding scaffolds see the largest relative growth (~80x vs. today) as AI-assisted development becomes a standard professional skill, not just an engineering tool. The developing world adopts more slowly — connectivity, language support, and economic incentives keep ~50% of humanity outside AI's direct reach by mid-2028. The total "AI touched" population is similar to Citrini's (~50% vs ~65%), but the <strong>distribution skews toward higher-value engagement</strong>.
+  </div>
+</div>
+
+<!-- Comparison strip shown on doomer/opus tabs -->
+<div id="comparison" class="comparison-strip" style="display:none;">
+  <div class="comparison-cell">
+    <div class="cell-label">Feb 2026</div>
+    <div class="cell-value">16%</div>
+    <div class="cell-sub">have ever used AI</div>
+  </div>
+  <div class="comparison-cell" id="comp-mid">
+    <div class="cell-label">June 2028 — Citrini</div>
+    <div class="cell-value delta-positive">65%</div>
+    <div class="cell-sub">+49 pp in 28 months</div>
+  </div>
+  <div class="comparison-cell" id="comp-right">
+    <div class="cell-label">June 2028 — Opus 4.6</div>
+    <div class="cell-value delta-positive">50%</div>
+    <div class="cell-sub">+34 pp in 28 months</div>
+  </div>
+</div>
+
+<script>
+const TOTAL = 2500;
+const COLS = 50;
+
+const configs = {
+  baseline: { never: 2100, free: 392, paid: 7, code: 1 },
+  doomer:   { never: 875, free: 1400, paid: 200, code: 25 },
+  opus:     { never: 1250, free: 875, paid: 275, code: 100 }
+};
+
+function buildGrid(containerId, config) {
+  const container = document.getElementById(containerId);
+  // Order: never first (top-left), then free, then paid, then code (bottom-right)
+  const order = [];
+  for (let i = 0; i < config.never; i++) order.push('never');
+  for (let i = 0; i < config.free; i++) order.push('free');
+  for (let i = 0; i < config.paid; i++) order.push('paid');
+  for (let i = 0; i < config.code; i++) order.push('code');
+
+  // Fill remaining if rounding leaves gaps
+  while (order.length < TOTAL) order.push('never');
+
+  const fragment = document.createDocumentFragment();
+  for (let i = 0; i < TOTAL; i++) {
+    const dot = document.createElement('div');
+    dot.className = `dot ${order[i]}`;
+    fragment.appendChild(dot);
+  }
+  container.appendChild(fragment);
+}
+
+function showTab(id) {
+  document.querySelectorAll('.chart-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+
+  const comp = document.getElementById('comparison');
+  comp.style.display = (id === 'baseline') ? 'none' : 'grid';
+}
+
+// Build all grids
+buildGrid('grid-baseline', configs.baseline);
+buildGrid('grid-doomer', configs.doomer);
+buildGrid('grid-opus', configs.opus);
+</script>
+
+</body>
+</html>
